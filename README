@@ -1,0 +1,36 @@
+FreeBSD 10.0 binary "challenge" thingy
+
+Files:
+  Makefile         - build script
+  README           - this file 
+  fnv1a_file.c     - Hash a string with fnv1a and use the resulting 64-bit 
+                     hash as the initial xor value for the data to be included
+                     in the final build artifact, and update the xor value
+                     with the fnv1a prime for every xor-op. This is probably  
+                     retarded, but it looks better than xor-ing blocks against 
+                     static data e.g., when the block to be xored is zero.
+  sect2014.asm     - Main project file 
+  solution         - The file that gets gzipped, xor-ed and included in the
+                     final build artifact
+  sect2014.b64     - The final build artifact, base64 encoded
+
+There's some non-standard stuff in sect2014.asm. I hope FreeBSD as a platform
+is homogenous enough so that if it works for me, it works for everyone.
+No guarantees.
+
+getting the solution from the .b64:
+$ base64 -d < sect2014.b64 > s
+$ chmod u+x s
+$ ./s 20sec-t14 | gzip -cd | display # (display is a part of ImageMagick)
+
+where '20sec-t14' is the correct 'key'
+
+The difficult thing with this challenge is that there's no validation on 
+the data once it's de-xored so you don't know if the data is correct unless
+you assume that the decoded data will be something meaningful. One way to solve
+it would be to make an exhaustive search for all possible keys and test the
+resulting data against known 'magic numbers'/file headers. 
+
+A clue to the challenge could be that the decoded data is expected to be a 
+gzip file.
+ 
